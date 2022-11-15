@@ -2,7 +2,7 @@ namespace ChateServerSignalR
 {
   public class UserConnection
   {
-    public string? User { get; set; }
-    public string? Room { get; set; }
+    public string User { get; set; } = null!;
+    public string Room { get; set; } = null!;
   }
 }

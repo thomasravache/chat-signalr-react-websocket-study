@@ -1,3 +1,4 @@
+using ChateServerSignalR;
 using ChatServerSignalR.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,6 +15,8 @@ builder.Services.AddCors(options =>
       .AllowCredentials();
   });
 });
+
+builder.Services.AddSingleton<IDictionary<string, UserConnection>>(opts => new Dictionary<string, UserConnection>());
 
 var app = builder.Build();
 

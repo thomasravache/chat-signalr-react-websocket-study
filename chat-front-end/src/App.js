@@ -2,12 +2,15 @@ import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Lobby from './components/Lobby';
 import { HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
-import { useState } from 'react';
+import { useState, memo } from 'react';
 import Chat from './components/Chat';
 
 function App() {
   const [connection, setConnection] = useState();
   const [messages, setMessages] = useState([]);
+  const [filmes, setFilmes] = useState([]);
+
+  console.log('renderizou');
 
   const joinRoom = async (user, room) => {
     try {
@@ -39,6 +42,24 @@ function App() {
     }
   };
 
+  const acionarFilmao = async () => {
+    const outraConnection = new HubConnectionBuilder()
+      .withUrl('https://localhost:5001/RealTime')
+      .configureLogging(LogLevel.Information)
+      .build();
+
+    outraConnection.on("ReceberMudancas", (filmesBanco) => {
+      if (JSON.stringify(filmesBanco) !== JSON.stringify(filmes)) {
+        setFilmes(filmesBanco);
+      }
+      console.log(JSON.stringify(filmesBanco) !== JSON.stringify(filmes))
+      console.log(filmesBanco, filmes);
+    });
+
+    await outraConnection.start();
+    await outraConnection.invoke("Teste");
+  };
+
   return (
     <div className="app">
       <h2>My Chat</h2>
@@ -48,8 +69,15 @@ function App() {
           ? <Lobby joinRoom={joinRoom} />
           : <Chat messages={messages} sendMessage={sendMessage} />
       }
+      <h1>filmão</h1>
+      <button onClick={acionarFilmao}>Acionar filmão</button>
+      <ul>
+        {
+          filmes.map((filme) => <li key={filme.id}>{filme.titulo}</li>)
+        }
+      </ul>
     </div>
   );
 }
 
-export default App;
+export default memo(App);
